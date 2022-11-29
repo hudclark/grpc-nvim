@@ -39,10 +39,19 @@ local function read_request_data(pos)
   return read(pos)
 end
 local function request_from_cursor()
-  local cursor_line = vim.fn.getcurpos()[2]
   local start = find_request_start()
   if (start > 0) then
-    return {args = read_request_args(start), data = read_request_data((start + 1))}
+    local data = read_request_data((start + 1))
+    local _end
+    local function _6_()
+      if data then
+        return #data
+      else
+        return 0
+      end
+    end
+    _end = (start + _6_())
+    return {start = start, ["end"] = _end, args = read_request_args(start), data = data}
   else
     return nil
   end

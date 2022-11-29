@@ -26,12 +26,13 @@
 
 
 (fn request-from-cursor []
-  (let [cursor-line (. (vim.fn.getcurpos) 2)
-	;; buf (vim.api.nvim_win_get_buf 0)
-	start (find-request-start)]
+  (let [start (find-request-start)]
     (if (> start 0)
-	{:args (read-request-args start)
-	:data (read-request-data (+ start 1))}
+	(let [data (read-request-data (+ start 1))
+	      end (+ start (if data (length data) 0))]
+	{: start : end
+	:args (read-request-args start)
+	:data data})
 	nil)))
 
 {: request-from-cursor}

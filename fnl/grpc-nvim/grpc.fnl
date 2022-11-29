@@ -42,6 +42,12 @@
     nil (api.nvim_err_writeln "Failed to create request")
     req (let [buf (buffer.get-or-create-tmp buffer-name)
 	      header (make-result-header req)]
+	  ;; Highlight the request we've pulled
+	  (buffer.highlight-range (vim.api.nvim_get_current_buf)
+				  (api.nvim_create_namespace "grpc-nvim")
+				  req.start
+				  req.end
+				  500)
 	  ;; Write a header to the buffer
 	  (api.nvim_buf_set_lines buf 0 -1 false header)
 	  (execute-request req buf))))

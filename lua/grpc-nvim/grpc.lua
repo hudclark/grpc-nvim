@@ -46,6 +46,7 @@ local function execute_under_cursor()
     local req = _6_
     local buf = buffer["get-or-create-tmp"](buffer_name)
     local header = make_result_header(req)
+    buffer["highlight-range"](vim.api.nvim_get_current_buf(), api.nvim_create_namespace("grpc-nvim"), req.start, req["end"], 500)
     api.nvim_buf_set_lines(buf, 0, -1, false, header)
     return execute_request(req, buf)
   else
