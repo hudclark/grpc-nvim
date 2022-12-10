@@ -5,7 +5,7 @@ local function get_or_create_tmp(name)
     local buf = api.nvim_create_buf(false, "nomodeline")
     api.nvim_buf_set_name(buf, name)
     api.nvim_buf_set_option(buf, "buftype", "nofile")
-    api.nvim_buf_set_option(buf, "ft", "proto")
+    api.nvim_buf_set_option(buf, "ft", "javascript")
     return buf
   elseif (nil ~= _1_) then
     local buf = _1_

@@ -8,7 +8,7 @@
     (let [buf (api.nvim_create_buf false :nomodeline)]
       (api.nvim_buf_set_name buf name)
       (api.nvim_buf_set_option buf :buftype :nofile)
-      (api.nvim_buf_set_option buf :ft :proto)
+      (api.nvim_buf_set_option buf :ft :javascript)
       buf)
     ;; Buffer already exists.
     buf
