@@ -3,10 +3,53 @@
   (vim.fn.search :^grpc :cbn 1))
 
 (fn read-request-args [pos]
-  "Returns space-separated arguments on a line starting with 'grpc'"
-  (match (vim.fn.split (vim.fn.getline pos) " ")
-    (where [cmd & args] (= (string.lower cmd) :grpc)) args
-    _ nil))
+  "Read arguments from a line starting with 'grpc'"
+
+  (fn parse [itr cur args in-str?]
+    ;; Get the next char from the line
+    (match (itr)
+      ;; Base case: reached end of line.
+      nil (if
+           ;; Were we within a quoted string?
+           in-str?
+           (error "Unclosed string")
+           (do
+             ;; Add cur if not empty
+             (when (> (length cur) 0)
+               (table.insert args cur))
+             args))
+      ;; Hit a quotation mark
+      "\"" (if
+             ;; Closing a string
+             in-str?
+             (do
+               (table.insert args cur)
+               (parse itr "" args))
+             ;; Starting a new string. Make sure that cur is empty
+             (= 0 (length cur))
+             (parse itr "" args true)
+             (error "Invalid string argument"))
+      ;; Hit whitespace
+      " " (if
+            ;; If we're in a string, do not start a new arg
+            in-str?
+            (parse itr (.. cur " ") args true)
+            ;; Otherwise, store the new arg and recurse
+            (do
+              (when (> (length cur) 0)
+                (table.insert args cur))
+              (parse itr "" args)))
+      ;; Normal case
+      other (parse itr (.. cur other) args in-str?)))
+
+  ;; Ensure the line starts with 'grpc'.
+  (let [line (vim.fn.getline pos)
+        prefix (line:sub 1 4)
+        suffix (line:sub 5)]
+    ;; Verify that the line starts with "grpc"
+    (if (= :grpc (prefix:lower))
+        (parse (suffix:gmatch ".") "" [])
+        nil)))
 
 (fn read-request-data [pos]
   "Reads JSON data starting from pos"
